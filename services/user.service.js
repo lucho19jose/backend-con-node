@@ -22,11 +22,7 @@ class UserService {
   }
 
   async create(data) {
-    const newUser = {
-      id: faker.datatype.uuid(),
-      ...data
-    }
-    this.users.push(newUser);
+    const newUser = models.User.create(data);
     return newUser;
   }
 
@@ -36,38 +32,23 @@ class UserService {
   }
 
   async findOne(id) {
-    /* try { */
-      const user = this.users.find(user => user.userId == id)
-      if(user) {
-        return user;
-      }else{
-        throw boom.notFound("User not Found");
-      }
-    /* } catch (error) {
-      throw boom.badRequest("IDK what happend");
-    } */
+    const user = await models.User.findByPk(id);
+    if(!user) {
+      boom.notFound('user not found');
+    }
+    return user;
   }
 
   async update(id, changes) {
-    const index = this.users.findIndex(item => item.userId === id);
-    if(index === -1) {
-      throw boom.notFound("User not found");
-    }
-    const user = this.users[index];
-    this.users[index] = {
-      ...user,
-      ...changes
-    };
-    return this.users[index];
+    const user = await this.findOne(id);
+    const rta = await user.update(changes);
+    return rta;
   }
 
   async delete(id) {
-    const index = this.users.findIndex(item => item.userId == id);
-    if(index === -1){
-      throw boom.notFound('User not found');
-    }
-    this.users.splice(index, 1);
-    return { id };
+    const user = await this.findOne(id);
+    await user.destroy();
+    return id;
   }
 }
 
