@@ -33,7 +33,7 @@ router.post('/',
   async (req ,res, next) => {
     try {
       const body = req.body;
-      res.json(body);
+      //res.json(body);
       const newCustomer = service.create(body);
       res.status(201).json(newCustomer);
 
